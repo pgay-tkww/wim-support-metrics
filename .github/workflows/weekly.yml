@@ -12,7 +12,7 @@ on:
       force:
         description: "Overwrite existing generated files"
         required: false
-        default: false
+        default: true
         type: boolean
 
 permissions:
@@ -45,7 +45,9 @@ jobs:
 
       - name: Run weekly pipeline
         run: |
-          if [ -n "${{ inputs.week }}" ] && [ "${{ inputs.force }}" = "true" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            python scripts/weekly.py --force
+          elif [ -n "${{ inputs.week }}" ] && [ "${{ inputs.force }}" = "true" ]; then
             python scripts/weekly.py "${{ inputs.week }}" --force
           elif [ -n "${{ inputs.week }}" ]; then
             python scripts/weekly.py "${{ inputs.week }}"
