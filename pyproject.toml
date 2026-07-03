@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "wim-support-metrics"
 version = "0.1.0"
@@ -11,6 +15,9 @@ dependencies = [
 dev = [
   "pytest>=8.0.0",
 ]
+
+[tool.setuptools.packages.find]
+include = ["wim_metrics*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
