@@ -1,0 +1,64 @@
+{
+  "changelog": {
+    "histories": [
+      {
+        "created": "2026-06-03T10:00:00+02:00",
+        "items": [
+          {
+            "field": "Component",
+            "fromString": null,
+            "toString": "Support"
+          }
+        ]
+      },
+      {
+        "created": "2026-06-10T11:00:00+02:00",
+        "items": [
+          {
+            "field": "Component",
+            "fromString": "Support",
+            "toString": "Support, Phoenix"
+          }
+        ]
+      }
+    ]
+  },
+  "fields": {
+    "assignee": {
+      "displayName": "Jane Doe"
+    },
+    "components": [
+      {
+        "name": "Support"
+      },
+      {
+        "name": "Alpha"
+      },
+      {
+        "name": "Phoenix"
+      }
+    ],
+    "created": "2026-06-01T09:30:00+02:00",
+    "customfield_10261": [
+      {
+        "id": 123,
+        "name": "WIM Sprint 42",
+        "state": "active"
+      }
+    ],
+    "labels": [
+      "wim-support:no-code",
+      "alpha-triage",
+      "customer-escalation"
+    ],
+    "resolutiondate": "2026-06-23T10:30:00+02:00",
+    "status": {
+      "name": "In Progress",
+      "statusCategory": {
+        "name": "In Progress"
+      }
+    },
+    "summary": "Investigate RSVP sync failure for support queue metrics"
+  },
+  "key": "GPWIM-123"
+}

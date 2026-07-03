@@ -1,0 +1,17 @@
+[project]
+name = "wim-support-metrics"
+version = "0.1.0"
+description = "Weekly WIM support metrics extracted from Jira and published to Confluence"
+requires-python = ">=3.11"
+dependencies = [
+  "requests>=2.32.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

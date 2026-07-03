@@ -1,0 +1,111 @@
+{
+  "issues": {
+    "GPWIM-123": {
+      "assignee": "Pat Gay",
+      "assigned_to_squad_at": "2026-06-10T11:00:00+02:00",
+      "assigned_to_support_at": "2026-06-03T10:00:00+02:00",
+      "components": [
+        "Alpha",
+        "Phoenix",
+        "Support"
+      ],
+      "created_at": "2026-06-01T09:00:00+02:00",
+      "key": "GPWIM-123",
+      "labels": [
+        "alpha-triage",
+        "customer-escalation",
+        "wim-support:no-code"
+      ],
+      "resolved_at": "2026-06-24T15:00:00+02:00",
+      "sprints": [
+        {
+          "end_date": "2026-06-29T09:00:00+02:00",
+          "id": 123,
+          "name": "WIM Sprint 42",
+          "overlaps_selected_week": true,
+          "start_date": "2026-06-15T09:00:00+02:00",
+          "state": "active"
+        }
+      ],
+      "status": "Done",
+      "status_category": "Done",
+      "summary": "Support escalation needs squad review",
+      "url": "https://theknotww.atlassian.net/browse/GPWIM-123"
+    }
+  },
+  "metrics": {
+    "cancelled": {
+      "count": 0,
+      "issues": [],
+      "title": "Cancelled"
+    },
+    "duplicate": {
+      "count": 0,
+      "issues": [],
+      "title": "Duplicate"
+    },
+    "no_code": {
+      "count": 1,
+      "issues": [
+        "GPWIM-123"
+      ],
+      "title": "No Code"
+    },
+    "resolved": {
+      "count": 1,
+      "issues": [
+        "GPWIM-123"
+      ],
+      "title": "Resolved"
+    },
+    "squad_done": {
+      "count": 1,
+      "issues": [
+        "GPWIM-123"
+      ],
+      "title": "Squad Done"
+    },
+    "squad_in_progress": {
+      "count": 0,
+      "issues": [],
+      "title": "Squad In Progress"
+    },
+    "squad_planned": {
+      "count": 1,
+      "issues": [
+        "GPWIM-123"
+      ],
+      "title": "Squad Planned"
+    },
+    "squad_queue": {
+      "count": 1,
+      "issues": [
+        "GPWIM-123"
+      ],
+      "title": "Squad Queue"
+    },
+    "support_queue": {
+      "count": 0,
+      "issues": [],
+      "title": "Support Queue"
+    }
+  },
+  "schema_version": 1,
+  "source": {
+    "jira_base_jql": "project = GPWIM AND component in (Support)",
+    "project_key": "GPWIM",
+    "squad_components": [
+      "Phoenix",
+      "Unicorns"
+    ],
+    "support_component": "Support"
+  },
+  "week": {
+    "end_date": "2026-06-28",
+    "iso_week": 26,
+    "iso_year": 2026,
+    "key": "2026-W26",
+    "start_date": "2026-06-22",
+    "timezone": "Europe/Madrid"
+  }
+}
