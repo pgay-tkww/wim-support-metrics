@@ -44,18 +44,46 @@ jobs:
         run: python -m pip install ".[dev]"
 
       - name: Run weekly pipeline
+        id: run_weekly
         run: |
+          set -eo pipefail
+          START_TS=$(date +%s)
+
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            python scripts/weekly.py --force
+            python scripts/weekly.py --force | tee /tmp/weekly_pipeline.log
           elif [ -n "${{ inputs.week }}" ] && [ "${{ inputs.force }}" = "true" ]; then
-            python scripts/weekly.py "${{ inputs.week }}" --force
+            python scripts/weekly.py "${{ inputs.week }}" --force | tee /tmp/weekly_pipeline.log
           elif [ -n "${{ inputs.week }}" ]; then
-            python scripts/weekly.py "${{ inputs.week }}"
+            python scripts/weekly.py "${{ inputs.week }}" | tee /tmp/weekly_pipeline.log
           elif [ "${{ inputs.force }}" = "true" ]; then
-            python scripts/weekly.py --force
+            python scripts/weekly.py --force | tee /tmp/weekly_pipeline.log
           else
-            python scripts/weekly.py
+            python scripts/weekly.py | tee /tmp/weekly_pipeline.log
           fi
+
+          END_TS=$(date +%s)
+          ELAPSED=$((END_TS - START_TS))
+
+          SUMMARY_LINE=$(grep '^\[weekly\] Summary:' /tmp/weekly_pipeline.log | tail -n 1 || true)
+          EXTRACT_LINE=$(grep '^\[weekly\] Extract complete:' /tmp/weekly_pipeline.log | tail -n 1 || true)
+          REPORT_LINE=$(grep '^\[weekly\] Report complete:' /tmp/weekly_pipeline.log | tail -n 1 || true)
+          PUBLISH_LINE=$(grep '^\[weekly\] Publish complete:' /tmp/weekly_pipeline.log | tail -n 1 || true)
+
+          WEEK_VALUE=$(echo "$SUMMARY_LINE" | sed -n 's/.*week=\([^ ]*\).*/\1/p')
+          TICKETS_VALUE=$(echo "$SUMMARY_LINE" | sed -n 's/.*tickets=\([0-9][0-9]*\).*/\1/p')
+          CONFLUENCE_URL=$(echo "$SUMMARY_LINE" | sed -n 's/.*confluence=\(.*\)$/\1/p')
+          DURATION_VALUE=$(echo "$SUMMARY_LINE" | sed -n 's/.*duration=\([^ ]*\).*/\1/p')
+
+          {
+            echo "week=$WEEK_VALUE"
+            echo "tickets=$TICKETS_VALUE"
+            echo "duration=$DURATION_VALUE"
+            echo "confluence_url=$CONFLUENCE_URL"
+            echo "elapsed_seconds=$ELAPSED"
+            if [ -n "$EXTRACT_LINE" ]; then echo "extract_done=yes"; else echo "extract_done=no"; fi
+            if [ -n "$REPORT_LINE" ]; then echo "report_done=yes"; else echo "report_done=no"; fi
+            if [ -n "$PUBLISH_LINE" ]; then echo "publish_done=yes"; else echo "publish_done=no"; fi
+          } >> "$GITHUB_OUTPUT"
 
       - name: Commit generated artifacts
         run: |
@@ -69,3 +97,36 @@ jobs:
             git commit -m "Update weekly WIM support metrics"
             git push
           fi
+
+      - name: Summary
+        run: |
+          WEEK="${{ steps.run_weekly.outputs.week }}"
+          TICKETS="${{ steps.run_weekly.outputs.tickets }}"
+          DURATION="${{ steps.run_weekly.outputs.duration }}"
+          CONFLUENCE_URL="${{ steps.run_weekly.outputs.confluence_url }}"
+          ELAPSED_SECONDS="${{ steps.run_weekly.outputs.elapsed_seconds }}"
+
+          if [ -z "$WEEK" ]; then
+            WEEK="(unknown)"
+          fi
+          if [ -z "$TICKETS" ]; then
+            TICKETS="(unknown)"
+          fi
+          if [ -z "$DURATION" ]; then
+            DURATION="${ELAPSED_SECONDS}s"
+          fi
+
+          echo "✅ Weekly support metrics generated for **$WEEK**" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| ⏱️ Duration | $DURATION |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 🎫 Tickets reviewed | $TICKETS |" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$CONFLUENCE_URL" ]; then
+            echo "| 📄 Confluence page | [Open page]($CONFLUENCE_URL) |" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "| 📄 Confluence page | (not available) |" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "| ✅ Extract step logged | ${{ steps.run_weekly.outputs.extract_done }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| ✅ Report step logged | ${{ steps.run_weekly.outputs.report_done }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| ✅ Publish step logged | ${{ steps.run_weekly.outputs.publish_done }} |" >> "$GITHUB_STEP_SUMMARY"
