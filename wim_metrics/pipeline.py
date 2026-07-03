@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from inspect import signature
 from pathlib import Path
+from time import perf_counter
 from typing import Callable
 
 from wim_metrics.config import load_config
@@ -48,7 +49,7 @@ def run_report(week_key: str, force: bool) -> Path:
     return write_weekly_report(week.key, **kwargs)
 
 
-def run_publish(week_key: str) -> None:
+def run_publish(week_key: str) -> str:
     week = ReportWeek.parse(week_key)
     report_path = REPORT_DIR / f"{week.key}.md"
     markdown = report_path.read_text()
@@ -70,9 +71,9 @@ def run_publish(week_key: str) -> None:
         week.confluence_title,
     )
     if existing_page:
-        client.update_page(existing_page["id"], week.confluence_title, html)
+        published_page = client.update_page(existing_page["id"], week.confluence_title, html)
     else:
-        client.create_page(
+        published_page = client.create_page(
             config.confluence_space_key,
             config.confluence_parent_page_id,
             week.confluence_title,
@@ -88,13 +89,36 @@ def run_publish(week_key: str) -> None:
             summary_html,
         )
 
+    page_id = str(published_page.get("id", "")).strip()
+    if not page_id:
+        raise RuntimeError("Publish succeeded but Confluence response did not include a page id")
+
+    return _confluence_page_url(config.confluence_base_url, page_id)
+
 
 def run_weekly(week_key: str | None, force: bool) -> None:
     week = default_report_week() if week_key is None else ReportWeek.parse(week_key)
+    started_at = perf_counter()
 
-    run_extract(week.key, force=force)
-    run_report(week.key, force=force)
-    run_publish(week.key)
+    snapshot_path = run_extract(week.key, force=force)
+    snapshot = read_json(snapshot_path)
+    ticket_count = _count_snapshot_issues(snapshot)
+    print(
+        f"[weekly] Extract complete: week={week.key} snapshot={snapshot_path} "
+        f"tickets={ticket_count}"
+    )
+
+    report_path = run_report(week.key, force=force)
+    print(f"[weekly] Report complete: week={week.key} report={report_path}")
+
+    confluence_url = run_publish(week.key)
+    print(f"[weekly] Publish complete: week={week.key} confluence={confluence_url}")
+
+    duration_seconds = perf_counter() - started_at
+    print(
+        f"[weekly] Summary: week={week.key} duration={duration_seconds:.1f}s "
+        f"tickets={ticket_count} confluence={confluence_url}"
+    )
 
 
 def _read_historical_snapshots(week: ReportWeek) -> list[dict]:
@@ -118,3 +142,12 @@ def _load_historical_summary_renderer() -> Callable[[list[dict]], str] | None:
         return None
 
     return render_historical_summary
+
+
+def _count_snapshot_issues(snapshot: dict) -> int:
+    issues = snapshot.get("issues", {})
+    return len(issues) if isinstance(issues, dict) else 0
+
+
+def _confluence_page_url(base_url: str, page_id: str) -> str:
+    return f"{base_url.rstrip('/')}/pages/viewpage.action?pageId={page_id}"
