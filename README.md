@@ -133,6 +133,6 @@ The squad column contains that squad's count and Jira query link. The `Total` co
 
 ## Scheduled Runs
 
-GitHub Actions runs every Monday with cron `0 4 * * 1`, installs `.[dev]`, runs `python scripts/weekly.py`, and commits generated changes under `data/export` and `data/reports`.
+GitHub Actions runs every Monday morning with cron `0 6 * * 1` (UTC), installs `.[dev]`, runs `python scripts/weekly.py`, and commits generated changes under `data/export` and `data/reports`.
 
 The workflow can also be started manually with optional `week` and `force` inputs. `week` accepts an ISO week key like `2026-W26`; `force` overwrites existing generated files.

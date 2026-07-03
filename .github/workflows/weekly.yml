@@ -2,7 +2,7 @@ name: Weekly WIM Support Metrics
 
 on:
   schedule:
-    - cron: "0 4 * * 1"
+    - cron: "0 6 * * 1"
   workflow_dispatch:
     inputs:
       week:
