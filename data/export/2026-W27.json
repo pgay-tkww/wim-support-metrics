@@ -8475,6 +8475,24 @@
       "summary": "PT - Lisboa doesn't appear as a \"Localidade\" - VC admin",
       "url": "https://theknotww.atlassian.net/browse/GPWIM-366"
     },
+    "GPWIM-3663": {
+      "assigned_to_squad_at": null,
+      "assigned_to_support_at": "2026-04-30T05:07:23.860-0400",
+      "assignee": "Pau Gay",
+      "components": [
+        "Couple Experience",
+        "Support"
+      ],
+      "created_at": "2026-04-24T15:34:21.136-0400",
+      "key": "GPWIM-3663",
+      "labels": [],
+      "resolved_at": null,
+      "sprints": [],
+      "status": "Unprioritized",
+      "status_category": "To Do",
+      "summary": "Weird vendor visibility & impression tracking behavior on WW US",
+      "url": "https://theknotww.atlassian.net/browse/GPWIM-3663"
+    },
     "GPWIM-367": {
       "assigned_to_squad_at": "2025-10-08T10:02:22.374-0400",
       "assigned_to_support_at": "2025-09-30T03:49:29.103-0400",
@@ -11217,7 +11235,7 @@
       "title": "Squad Queue (Two Weeks Old)"
     },
     "support_queue": {
-      "count": 40,
+      "count": 41,
       "issues": [
         "GPWIM-131",
         "GPWIM-2069",
@@ -11242,6 +11260,7 @@
         "GPWIM-3298",
         "GPWIM-3315",
         "GPWIM-3617",
+        "GPWIM-3663",
         "GPWIM-3739",
         "GPWIM-3775",
         "GPWIM-3783",
@@ -11318,11 +11337,12 @@
       "title": "Support Queue (Three Months Old)"
     },
     "support_queue_two_months_old": {
-      "count": 5,
+      "count": 6,
       "issues": [
         "GPWIM-2106",
         "GPWIM-2778",
         "GPWIM-3617",
+        "GPWIM-3663",
         "GPWIM-3739",
         "GPWIM-3775"
       ],
