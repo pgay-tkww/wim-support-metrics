@@ -95,6 +95,7 @@ jobs:
             echo "No generated changes to commit."
           else
             git commit -m "Update weekly WIM support metrics"
+            git pull --rebase origin "${{ github.ref_name }}"
             git push
           fi
 
