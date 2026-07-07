@@ -79,6 +79,10 @@ def is_squad_queue(issue: dict[str, Any]) -> bool:
     return SUPPORT_COMPONENT in components and not components.isdisjoint(SQUAD_COMPONENTS)
 
 
+def is_done(issue: dict[str, Any]) -> bool:
+    return issue.get("status_category") == "Done"
+
+
 def resolved_in_week(issue: dict[str, Any], week: ReportWeek) -> bool:
     resolved = parse_dt(issue.get("resolved_at"))
     return resolved is not None and week.start <= resolved < week.end_exclusive
@@ -98,8 +102,10 @@ def _bucket_title(metric_id: str) -> str:
 
 
 def calculate_metrics(issues: dict[str, dict[str, Any]], week: ReportWeek) -> dict[str, Any]:
-    support_keys = [key for key, value in issues.items() if is_support_queue(value)]
-    squad_keys = [key for key, value in issues.items() if is_squad_queue(value)]
+    support_component_keys = [key for key, value in issues.items() if is_support_queue(value)]
+    squad_component_keys = [key for key, value in issues.items() if is_squad_queue(value)]
+    support_keys = [key for key in support_component_keys if not is_done(issues[key])]
+    squad_keys = [key for key in squad_component_keys if not is_done(issues[key])]
     resolved_keys = [key for key, value in issues.items() if resolved_in_week(value, week)]
 
     result = {
@@ -147,7 +153,7 @@ def calculate_metrics(issues: dict[str, dict[str, Any]], week: ReportWeek) -> di
 
     planned_keys = [
         key
-        for key in squad_keys
+        for key in squad_component_keys
         if any(sprint.get("overlaps_selected_week") for sprint in as_list(issues[key].get("sprints")))
     ]
     result["squad_planned"] = metric(METRIC_TITLES["squad_planned"], planned_keys)

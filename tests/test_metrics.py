@@ -98,8 +98,8 @@ def test_calculates_queue_resolution_and_capacity_metrics():
 
     metrics = calculate_metrics(issues, week)
 
-    assert metrics["support_queue"]["issues"] == ["GPWIM-1", "GPWIM-4", "GPWIM-5"]
-    assert metrics["squad_queue"]["issues"] == ["GPWIM-2", "GPWIM-3", "GPWIM-6"]
+    assert metrics["support_queue"]["issues"] == ["GPWIM-1"]
+    assert metrics["squad_queue"]["issues"] == ["GPWIM-2", "GPWIM-6"]
     assert metrics["resolved"]["issues"] == ["GPWIM-3", "GPWIM-4", "GPWIM-5"]
     assert metrics["no_code"]["issues"] == ["GPWIM-3"]
     assert metrics["duplicate"]["issues"] == ["GPWIM-4"]
@@ -108,6 +108,53 @@ def test_calculates_queue_resolution_and_capacity_metrics():
     assert metrics["squad_done"]["issues"] == ["GPWIM-3"]
     assert metrics["support_queue_one_week_old"]["title"] == "Support Queue (One Week Old)"
     assert metrics["squad_queue_two_months_old"]["title"] == "Squad Queue (Two Months Old)"
+
+
+def test_done_category_tickets_are_excluded_only_from_queue_inventory():
+    week = ReportWeek.parse("2026-W26")
+    issues = {
+        "GPWIM-1": issue(
+            key="GPWIM-1",
+            components=["Support"],
+            status="Done",
+            status_category="Done",
+            resolved_at="2026-06-24T11:00:00+02:00",
+            assigned_to_support_at="2026-06-20T09:00:00+02:00",
+        ),
+        "GPWIM-2": issue(
+            key="GPWIM-2",
+            components=["Support", "Phoenix"],
+            status="Post deploy verification",
+            status_category="Done",
+            resolved_at="2026-06-25T11:00:00+02:00",
+            assigned_to_squad_at="2026-06-20T09:00:00+02:00",
+            sprints=[{"overlaps_selected_week": True}],
+        ),
+        "GPWIM-3": issue(
+            key="GPWIM-3",
+            components=["Support"],
+            status="In Progress",
+            status_category="In Progress",
+            assigned_to_support_at="2026-06-24T09:00:00+02:00",
+        ),
+        "GPWIM-4": issue(
+            key="GPWIM-4",
+            components=["Support", "Unicorns"],
+            status="In Progress",
+            status_category="In Progress",
+            assigned_to_squad_at="2026-06-24T09:00:00+02:00",
+        ),
+    }
+
+    metrics = calculate_metrics(issues, week)
+
+    assert metrics["support_queue"]["issues"] == ["GPWIM-3"]
+    assert metrics["support_queue_new"]["issues"] == ["GPWIM-3"]
+    assert metrics["squad_queue"]["issues"] == ["GPWIM-4"]
+    assert metrics["squad_queue_new"]["issues"] == ["GPWIM-4"]
+    assert metrics["resolved"]["issues"] == ["GPWIM-1", "GPWIM-2"]
+    assert metrics["squad_planned"]["issues"] == ["GPWIM-2"]
+    assert metrics["squad_done"]["issues"] == ["GPWIM-2"]
 
 
 def test_rejects_naive_metric_timestamps():
